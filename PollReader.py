@@ -86,14 +86,12 @@ class PollReader():
         max_harris = max(self.data_dict['Harris result'])
 
         max_trump = max(self.data_dict['Trump result'])
-
         if max_harris > max_trump:
-            return f"Harris {max_harris}"
+            return f"Harris {max_harris:.1f}%"
         elif max_trump > max_harris:
-            return f"Trump {max_trump}"
+            return f"Trump {max_trump:.1f}%"
         else:
-            return f"EVEN {max_harris}"
-        pass
+            return f"EVEN {max_harris:.1f}%"
 
 
     def likely_voter_polling_average(self):
@@ -118,7 +116,6 @@ class PollReader():
             return (avg_harris, avg_trump)
         else:
             return (0.0, 0.0)
-        pass
 
 
     def polling_history_change(self):
@@ -132,7 +129,26 @@ class PollReader():
             tuple: A tuple containing the net change for Harris and Trump, in that order.
                    Positive values indicate an increase, negative values indicate a decrease.
         """
-        pass
+        harris_results = self.data_dict['Harris result']
+        trump_results = self.data_dict['Trump result']
+
+        n = len(harris_results)
+
+        count = 30
+
+        if n < 30:
+            count = n
+
+        earliest_harris_avg = sum(harris_results[:count]) / count
+        earliest_trump_avg = sum(trump_results[:count]) / count
+
+        latest_harris_avg = sum(harris_results[-count:]) / count
+        latest_trump_avg = sum(trump_results[-count:]) / count
+
+        harris_change = latest_harris_avg - earliest_harris_avg
+        trump_change = latest_trump_avg - earliest_trump_avg
+
+        return (harris_change, trump_change)
 
 
 class TestPollReader(unittest.TestCase):
